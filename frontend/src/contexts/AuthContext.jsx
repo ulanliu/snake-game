@@ -17,11 +17,11 @@ export const AuthProvider = ({ children }) => {
         setLoading(false);
     }, []);
 
-    const login = async (username) => {
+    const login = async (username, password) => {
         setLoading(true);
         setError(null);
         try {
-            const data = await auth.login(username);
+            const data = await auth.login(username, password);
             setUser(data);
             localStorage.setItem('snake_game_current_user', JSON.stringify(data));
             return data;
@@ -33,11 +33,11 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    const signup = async (username) => {
+    const signup = async (username, password) => {
         setLoading(true);
         setError(null);
         try {
-            const data = await auth.signup(username);
+            const data = await auth.signup(username, password);
             setUser(data);
             localStorage.setItem('snake_game_current_user', JSON.stringify(data));
             return data;

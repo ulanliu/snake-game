@@ -4,10 +4,12 @@ from typing import Optional
 
 class User(BaseModel):
     username: str
+    password: str  # Hashed password
     createdAt: datetime
 
 class UserCreate(BaseModel):
     username: str
+    password: str
 
 class AuthResponse(BaseModel):
     username: str

@@ -1,9 +1,11 @@
+
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 
 export default function AuthModal({ isOpen, onClose }) {
     const [isLogin, setIsLogin] = useState(true);
     const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const { login, signup } = useAuth();
 
@@ -13,16 +15,16 @@ export default function AuthModal({ isOpen, onClose }) {
         e.preventDefault();
         setError('');
 
-        if (!username.trim()) {
-            setError('Username is required');
+        if (!username.trim() || !password.trim()) {
+            setError('Username and password are required');
             return;
         }
 
         try {
             if (isLogin) {
-                await login(username);
+                await login(username, password);
             } else {
-                await signup(username);
+                await signup(username, password);
             }
             onClose();
         } catch (err) {
@@ -54,6 +56,19 @@ export default function AuthModal({ isOpen, onClose }) {
                             onChange={(e) => setUsername(e.target.value)}
                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                             placeholder="Enter username"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">
+                            Password
+                        </label>
+                        <input
+                            type="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                            placeholder="Enter password"
                         />
                     </div>
 

@@ -15,32 +15,37 @@ def test_root():
     assert response.json() == {"message": "Snake Game API is running"}
 
 def test_signup():
-    response = client.post("/api/auth/signup", json={"username": "testuser"})
+    response = client.post("/api/auth/signup", json={"username": "testuser", "password": "password123"})
     assert response.status_code == 201
     data = response.json()
     assert data["username"] == "testuser"
     assert "token" in data
 
 def test_signup_duplicate():
-    client.post("/api/auth/signup", json={"username": "testuser"})
-    response = client.post("/api/auth/signup", json={"username": "testuser"})
+    client.post("/api/auth/signup", json={"username": "testuser", "password": "password123"})
+    response = client.post("/api/auth/signup", json={"username": "testuser", "password": "password123"})
     assert response.status_code == 409
 
 def test_login():
-    client.post("/api/auth/signup", json={"username": "testuser"})
-    response = client.post("/api/auth/login", json={"username": "testuser"})
+    client.post("/api/auth/signup", json={"username": "testuser", "password": "password123"})
+    response = client.post("/api/auth/login", json={"username": "testuser", "password": "password123"})
     assert response.status_code == 200
     data = response.json()
     assert data["username"] == "testuser"
     assert "token" in data
 
+def test_login_wrong_password():
+    client.post("/api/auth/signup", json={"username": "testuser", "password": "password123"})
+    response = client.post("/api/auth/login", json={"username": "testuser", "password": "wrongpassword"})
+    assert response.status_code == 401
+
 def test_login_not_found():
-    response = client.post("/api/auth/login", json={"username": "nonexistent"})
+    response = client.post("/api/auth/login", json={"username": "nonexistent", "password": "password123"})
     assert response.status_code == 404
 
 def test_submit_score():
     # Signup and get token
-    auth_response = client.post("/api/auth/signup", json={"username": "player1"})
+    auth_response = client.post("/api/auth/signup", json={"username": "player1", "password": "password123"})
     token = auth_response.json()["token"]
     
     # Submit score
@@ -56,8 +61,8 @@ def test_submit_score():
 
 def test_get_leaderboard():
     # Create users and scores
-    token1 = client.post("/api/auth/signup", json={"username": "p1"}).json()["token"]
-    token2 = client.post("/api/auth/signup", json={"username": "p2"}).json()["token"]
+    token1 = client.post("/api/auth/signup", json={"username": "p1", "password": "p1"}).json()["token"]
+    token2 = client.post("/api/auth/signup", json={"username": "p2", "password": "p2"}).json()["token"]
     
     client.post("/api/leaderboard", json={"score": 100}, headers={"Authorization": f"Bearer {token1}"})
     client.post("/api/leaderboard", json={"score": 200}, headers={"Authorization": f"Bearer {token2}"})
