@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   GRID_SIZE,
   CELL_SIZE,
@@ -8,6 +8,7 @@ import {
   generateFood as generateFoodLogic,
   moveSnake as moveSnakeLogic
 } from './gameLogic';
+import './App.css';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { leaderboard } from './api/client';
 import AuthModal from './components/AuthModal';
@@ -28,6 +29,8 @@ function GameContent() {
   const [showLeaderboard, setShowLeaderboard] = useState(false);
 
   const { user, logout } = useAuth();
+  const scoreSubmittedRef = useRef(false);
+
 
   useEffect(() => {
     if (theme === 'dark') {
@@ -53,7 +56,9 @@ function GameContent() {
 
   const handleGameOver = useCallback(async (finalScore) => {
     setGameOver(true);
-    if (user && finalScore > 0) {
+    // Only submit score once per game session
+    if (user && finalScore > 0 && !scoreSubmittedRef.current) {
+      scoreSubmittedRef.current = true;
       try {
         await leaderboard.submitScore(user.username, finalScore);
       } catch (error) {
@@ -68,6 +73,7 @@ function GameContent() {
     setDirection(INITIAL_DIRECTION);
     setGameOver(false);
     setScore(0);
+    scoreSubmittedRef.current = false; // Reset submission flag
     setIsPaused(false);
   };
 
